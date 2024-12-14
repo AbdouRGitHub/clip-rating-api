@@ -32,6 +32,6 @@ async function bootstrap(configService: ConfigService) {
   await app.use(bodyParser.json({ limit: '100mb' }));
   await app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
   await app.use(cookieParser());
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(configService.get('PORT') ?? 3000);
 }
 bootstrap(new ConfigService());
