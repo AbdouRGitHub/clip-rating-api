@@ -7,6 +7,7 @@ import { DataSource } from 'typeorm';
 import { Session } from './auth/entities/session.entity';
 import * as bodyParser from 'body-parser';
 import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap(configService: ConfigService) {
   const app = await NestFactory.create(AppModule);
@@ -30,6 +31,7 @@ async function bootstrap(configService: ConfigService) {
   await app.enableCors();
   await app.use(bodyParser.json({ limit: '100mb' }));
   await app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
+  await app.use(cookieParser());
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap(new ConfigService());
