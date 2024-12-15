@@ -6,6 +6,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -20,9 +25,17 @@ export class User {
   @Column({ select: false })
   password: string;
 
-  @CreateDateColumn()
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+    select: false,
+  })
+  role: UserRole;
+
+  @CreateDateColumn({ select: false })
   readonly createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ select: false })
   readonly updatedAt: Date;
 }
