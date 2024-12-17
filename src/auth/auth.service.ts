@@ -1,43 +1,41 @@
-import { Injectable, Req, Res } from '@nestjs/common';
-import { User, UserRole } from 'src/user/entities/user.entity';
+import { BadRequestException, Injectable, Req, Res } from '@nestjs/common';
+import { User } from 'src/user/entities/user.entity';
 import { Request, Response } from 'express';
+import { AuthDto } from './dto/auth.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  private users: User[] = [
-    {
-      id: 'fazdapzidjaojdaz',
-      email: 'test@gmail.com',
-      username: 'test',
-      password: 'test',
-      role: UserRole.USER,
-      createdAt: undefined,
-      updatedAt: undefined,
-    },
-    {
-      id: 'fazdapzidjaojdaz',
-      email: 'admin@gmail.com',
-      username: 'admin',
-      password: 'admin',
-      role: UserRole.ADMIN,
-      createdAt: undefined,
-      updatedAt: undefined,
-    },
-  ];
+  constructor(
+    @InjectRepository(User) private readonly userRespository: Repository<User>,
+  ) {}
 
-  constructor() {}
+  async login(authDto: AuthDto, @Req() request: Request) {
+    const user = await this.userRespository.findOne({
+      where: {
+        email: authDto.email,
+      },
+      select: ['id', 'email', 'password', 'role'],
+    });
 
-  async login(email: string, password: string, @Req() request: Request) {
-    const user = this.users.find(
-      (user) => user.email === email && user.password === password,
-    );
-    if (user) {
-      request.session.userId = user.id;
-      request.session.role = user.role;
-      return { message: 'Login success', sessionId: request.session.userId };
-    } else {
-      throw new Error('User not found');
+    if (!user) {
+      throw new BadRequestException('Invalid credentials');
     }
+
+    const isPasswordMatch: boolean = await bcrypt.compare(
+      authDto.password,
+      user.password,
+    );
+
+    if (!isPasswordMatch) {
+      throw new BadRequestException('Invalid credentials');
+    }
+
+    request.session.userId = user.id;
+    request.session.role = user.role;
+    return 'Login successful';
   }
 
   async logout(@Req() request: Request, @Res() response: Response) {
@@ -49,15 +47,17 @@ export class AuthService {
         });
       });
       response.clearCookie('session_nest');
-      response.sendStatus(200);
+      response.sendStatus(204);
     } catch (error) {
-      console.error('Failed to logout:', error);
-      response.status(500).send({ message: 'Logout failed', error });
+      response.status(500);
     }
   }
 
   async profile(@Req() request: Request) {
-    return await this.users.find((user) => user.id === request.session.userId);
+    return await this.userRespository.findOne({
+      where: {
+        id: request.session.userId,
+      },
+    });
   }
-
 }
