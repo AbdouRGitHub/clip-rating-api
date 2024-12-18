@@ -9,7 +9,11 @@ import { Request } from 'express';
 import { Observable } from 'rxjs';
 
 const matchRoles = (roles: string[], userRole: string) => {
-  return roles.some((role) => role === userRole);
+  const match = roles.some((role) => role === userRole);
+  if (!match) {
+    throw new UnauthorizedException('ROLE_NOT_MATCH');
+  }
+  return true;
 };
 
 @Injectable()
@@ -18,9 +22,11 @@ export class AuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-
     //get the roles from the decorator
-    const roles: string[] = this.reflector.get<string[]>('roles', context.getHandler());
+    const roles: string[] = this.reflector.get<string[]>(
+      'roles',
+      context.getHandler(),
+    );
 
     if (!roles) {
       return true;
@@ -31,7 +37,7 @@ export class AuthGuard implements CanActivate {
     if (!request.session.userId) {
       throw new UnauthorizedException('SESSION_NOT_FOUND');
     }
-    
+
     //check if the user has the right role
     return matchRoles(roles, request.session.role);
   }
