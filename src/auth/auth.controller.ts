@@ -3,6 +3,7 @@ import { AuthDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
 import { Roles } from './decorator/roles.decorator';
+import { UserRole } from 'src/user/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -18,7 +19,7 @@ export class AuthController {
     return await this.authService.logout(request, response);
   }
 
-  @Roles(['user', 'admin'])
+  @Roles([UserRole.USER, UserRole.ADMIN])
   @Get('profile')
   async profile(@Req() request: Request) {
     return await this.authService.profile(request);

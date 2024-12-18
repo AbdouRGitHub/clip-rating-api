@@ -42,7 +42,7 @@ export class User {
   readonly updatedAt: Date;
 
   @BeforeInsert()
-  async hashPassword(): Promise<void> {
+  private async hashPassword(): Promise<void> {
     if (this.password) {
       this.password = await bcrypt.hash(this.password, 10);
     }

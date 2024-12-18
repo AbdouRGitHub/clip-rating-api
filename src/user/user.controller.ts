@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   Req,
+  HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
 import { User } from './entities/user.entity';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('user')
 export class UserController {
@@ -33,17 +35,24 @@ export class UserController {
     return this.userService.findOne(id, request);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @Req() request: Request,
-  ) {
-    return this.userService.update(id, updateUserDto, request);
+  @Patch()
+  @HttpCode(204)
+  update(@Body() updateUserDto: UpdateUserDto, @Req() request: Request) {
+    return this.userService.update(updateUserDto, request);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string, @Req() request: Request) {
-    return this.userService.remove(+id, request);
+  @Patch('password')
+  @HttpCode(204)
+  updatePassword(
+    @Body() updatePasswordDto: UpdatePasswordDto,
+    @Req() request: Request,
+  ) {
+    return this.userService.updatePassword(updatePasswordDto, request);
+  }
+
+  @Delete()
+  @HttpCode(204)
+  remove(@Req() request: Request) {
+    return this.userService.remove(request);
   }
 }
