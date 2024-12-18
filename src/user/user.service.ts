@@ -64,7 +64,7 @@ export class UserService {
     if (!user) {
       throw new BadRequestException('User not found');
     }
-    
+
     try {
       await this.userRepository.save(user);
       return;
