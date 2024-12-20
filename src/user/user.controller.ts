@@ -8,6 +8,7 @@ import {
   Delete,
   Req,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,6 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
 import { User } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-password.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Controller('user')
 export class UserController {
@@ -26,8 +28,11 @@ export class UserController {
   }
 
   @Get()
-  findAll(@Req() request: Request): Promise<User[]> {
-    return this.userService.findAll(request);
+  findAll(
+    @Query() paginationDto: PaginationDto,
+    @Req() request: Request,
+  ): Promise<[User[], number]> {
+    return this.userService.findAll(paginationDto, request);
   }
 
   @Get(':id')

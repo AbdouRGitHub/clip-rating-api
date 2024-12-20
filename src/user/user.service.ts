@@ -3,10 +3,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Request } from 'express';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import * as bcrypt from 'bcrypt';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
 export class UserService {
@@ -46,15 +47,24 @@ export class UserService {
     }
   }
 
-  async findAll(@Req() request: Request): Promise<User[]> {
-    return await this.userRepository.find();
+  async findAll(
+    paginationDto: PaginationDto,
+    request: Request,
+  ): Promise<[User[], number]> {
+    const { page, limit } = paginationDto;
+    return await this.userRepository.findAndCount({
+      where: { id: Not(request.session.userId) },
+      take: limit,
+      skip: (page - 1) * limit,
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  async findOne(id: string, @Req() request: Request): Promise<User> {
+  async findOne(id: string, request: Request): Promise<User> {
     return await this.userRepository.findOneBy({ id });
   }
 
-  async update(updateUserDto: UpdateUserDto, @Req() request: Request) {
+  async update(updateUserDto: UpdateUserDto, request: Request) {
     const { userId } = request.session;
     const user = await this.userRepository.preload({
       id: userId,
