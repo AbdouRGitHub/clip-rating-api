@@ -3,10 +3,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Relationship } from 'src/relationship/entities/relationship.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -40,6 +42,12 @@ export class User {
 
   @UpdateDateColumn({ select: false })
   readonly updatedAt: Date;
+
+  @OneToMany(() => Relationship, (relation) => relation.sender)
+  initiatedRelationships: Relationship[];
+
+  @OneToMany(() => Relationship, (relation) => relation.receiver)
+  receivedRelationships: Relationship[];
 
   @BeforeInsert()
   private async hashPassword(): Promise<void> {

@@ -8,6 +8,7 @@ import { databaseConfig } from 'database/config';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
+import { RelationshipModule } from './relationship/relationship.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthGuard } from './auth/guard/auth.guard';
     TypeOrmModule.forRoot(databaseConfig),
     UserModule,
     AuthModule,
+    RelationshipModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],
