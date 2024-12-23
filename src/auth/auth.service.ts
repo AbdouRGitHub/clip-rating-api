@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Req, Res } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Req,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
 import { Request, Response } from 'express';
 import { AuthDto } from './dto/auth.dto';
@@ -9,11 +15,11 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private readonly userRespository: Repository<User>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
   async login(authDto: AuthDto, @Req() request: Request) {
-    const user = await this.userRespository.findOne({
+    const user = await this.userRepository.findOne({
       where: {
         email: authDto.email,
       },
@@ -34,7 +40,6 @@ export class AuthService {
     }
 
     request.session.userId = user.id;
-    request.session.role = user.role;
     return 'Login successful';
   }
 
@@ -54,10 +59,24 @@ export class AuthService {
   }
 
   async profile(@Req() request: Request) {
-    return await this.userRespository.findOne({
+    return await this.userRepository.findOne({
       where: {
         id: request.session.userId,
       },
     });
+  }
+
+  async getUserRole(@Req() request: Request) {
+    const { userId } = request.session;
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'role'],
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('USER_NOT_FOUND');
+    }
+
+    return user.role;
   }
 }
