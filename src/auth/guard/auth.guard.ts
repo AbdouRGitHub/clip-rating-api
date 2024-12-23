@@ -5,8 +5,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
-import { Observable } from 'rxjs';
+import { User } from 'src/user/entities/user.entity';
+import { Repository } from 'typeorm';
 
 const matchRoles = (roles: string[], userRole: string) => {
   const match = roles.some((role) => role === userRole);
@@ -18,10 +20,13 @@ const matchRoles = (roles: string[], userRole: string) => {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  constructor(
+    private reflector: Reflector,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     //get the roles from the decorator
     const roles: string[] = this.reflector.get<string[]>(
       'roles',
@@ -33,12 +38,22 @@ export class AuthGuard implements CanActivate {
     }
 
     const request: Request = context.switchToHttp().getRequest();
+
     //check if the user session exists
     if (!request.session.userId) {
       throw new UnauthorizedException('SESSION_NOT_FOUND');
     }
 
+    const user: User = await this.userRepository.findOne({
+      where: { id: request.session.userId },
+      select: ['id', 'role'],
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('USER_NOT_FOUND');
+    }
+
     //check if the user has the right role
-    return matchRoles(roles, request.session.role);
+    return matchRoles(roles, user.role);
   }
 }
