@@ -24,16 +24,7 @@ export class RelationshipService {
   ) {}
 
   async sendFriendRequest(receiverId: string, request: Request) {
-    //Check if the sender exists
-    const sender: User = await this.userRepository.findOne({
-      where: { id: request.session.userId },
-      select: ['id'],
-    });
-
-    if (!sender) {
-      throw new BadRequestException('Sender not found');
-    }
-
+    const { userId } = request.session;
     // Check if the reciever exists
     const receiver: User = await this.userRepository.findOne({
       where: { id: receiverId },
@@ -54,8 +45,8 @@ export class RelationshipService {
     // Check if the relationship already exists
     const relationExists: boolean = await this.relationshipRepository.exists({
       where: [
-        { sender: sender, receiver: receiver },
-        { sender: receiver, receiver: sender },
+        { sender: { id: userId }, receiver: receiver },
+        { sender: receiver, receiver: { id: userId } },
       ],
     });
 
@@ -67,7 +58,7 @@ export class RelationshipService {
 
     const friendRequest: Relationship =
       await this.relationshipRepository.create({
-        sender: sender,
+        sender: { id: userId },
         receiver: receiver,
         status: RelationshipStatus.FRIEND_REQUEST,
       });
@@ -227,6 +218,7 @@ export class RelationshipService {
         receiver: { id: receiverId },
         status: RelationshipStatus.BLOCKED,
       });
+      return;
     } catch (err) {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
