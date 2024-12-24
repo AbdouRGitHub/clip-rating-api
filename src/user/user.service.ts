@@ -1,9 +1,14 @@
-import { BadRequestException, Injectable, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Req,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Not, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { Request } from 'express';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import * as bcrypt from 'bcrypt';
@@ -43,7 +48,7 @@ export class UserService {
       delete userCreated.password;
       return await userCreated;
     } catch (error) {
-      throw new BadRequestException(error);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -52,16 +57,24 @@ export class UserService {
     request: Request,
   ): Promise<[User[], number]> {
     const { page, limit } = paginationDto;
-    return await this.userRepository.findAndCount({
-      where: { id: Not(request.session.userId) },
-      take: limit,
-      skip: (page - 1) * limit,
-      order: { createdAt: 'DESC' },
-    });
+    try {
+      return await this.userRepository.findAndCount({
+        where: { id: Not(request.session.userId) },
+        take: limit,
+        skip: (page - 1) * limit,
+        order: { createdAt: 'DESC' },
+      });
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
   async findOne(id: string, request: Request): Promise<User> {
-    return await this.userRepository.findOneBy({ id });
+    try {
+      return await this.userRepository.findOneBy({ id });
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
+    }
   }
 
   async update(updateUserDto: UpdateUserDto, request: Request) {
@@ -78,8 +91,8 @@ export class UserService {
     try {
       await this.userRepository.save(user);
       return;
-    } catch {
-      throw new BadRequestException('Error updating user');
+    } catch (err) {
+      throw new InternalServerErrorException(err.message);
     }
   }
 
@@ -124,7 +137,7 @@ export class UserService {
       await this.userRepository.delete({ id: userId });
       return;
     } catch (err) {
-      throw new BadRequestException(err);
+      throw new InternalServerErrorException(err.message);
     }
   }
 }
