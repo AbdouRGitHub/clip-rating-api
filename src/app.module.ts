@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { RelationshipModule } from './relationship/relationship.module';
+import { PlaylistModule } from './playlist/playlist.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RelationshipModule } from './relationship/relationship.module';
     UserModule,
     AuthModule,
     RelationshipModule,
+    PlaylistModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],
