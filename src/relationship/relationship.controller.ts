@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -10,29 +11,74 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { RelationshipService } from './relationship.service';
-import { FriendPaginationDto } from './dto/friend-pagination.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
-@Controller('friend')
+@Controller('relationship')
 export class RelationshipController {
   constructor(private relationshipService: RelationshipService) {}
 
-  @Post(':id')
-  sendFriendRequest(@Param('id') receiverId: string, @Req() request: Request) {
+  @Post('friend-request')
+  sendFriendRequest(
+    @Body('receiverId') receiverId: string,
+    @Req() request: Request,
+  ) {
     return this.relationshipService.sendFriendRequest(receiverId, request);
   }
 
-  @Get()
-  getFriendRequests(@Query() friendPaginationDto: FriendPaginationDto, @Req() request: Request) {}
+  @Get('friend-requests')
+  getFriendRequests(
+    @Query() friendPaginationDto: PaginationDto,
+    @Req() request: Request,
+  ) {
+    return this.relationshipService.getFriendRequests(
+      friendPaginationDto,
+      request,
+    );
+  }
 
-  @Get(':id')
-  getFriendRequest(@Param('id') friendRequestId: string, @Req() request: Request) {}
+  @Get('friend-requests/sent')
+  getSentFriendRequests(
+    @Query() friendPaginationDto: PaginationDto,
+    @Req() request: Request,
+  ) {
+    return this.relationshipService.getSentFriendRequests(
+      friendPaginationDto,
+      request,
+    );
+  }
 
-  @Patch(':id/accept')
-  acceptFriendRequest(@Param('id') friendRequestId: string, @Req() request: Request) {}
+  @Get('friend-request/:id')
+  getFriendRequest(
+    @Param('id') friendRequestId: string,
+    @Req() request: Request,
+  ) {
+    return this.relationshipService.getFriendRequest(friendRequestId, request);
+  }
 
-  @Delete('id/reject')
-  rejectFriendRequest(@Param('id') friendRequestId: string, @Req() request: Request) {}
+  @Patch('friend-request/:id/accept')
+  acceptFriendRequest(
+    @Param('id') friendRequestId: string,
+    @Req() request: Request,
+  ) {
+    return this.relationshipService.acceptFriendRequest(
+      friendRequestId,
+      request,
+    );
+  }
 
-  @Patch(':id/block')
-  blockUser(@Param('id') receiverId: string, @Req() request: Request) {}
+  @Delete('friend-request/:id/reject')
+  rejectFriendRequest(
+    @Param('id') friendRequestId: string,
+    @Req() request: Request,
+  ) {
+    return this.relationshipService.rejectFriendRequest(
+      friendRequestId,
+      request,
+    );
+  }
+
+  @Patch(':id')
+  blockUser(@Body('receiverId') receiverId: string, @Req() request: Request) {
+    return this.relationshipService.blockUser(receiverId, request);
+  }
 }

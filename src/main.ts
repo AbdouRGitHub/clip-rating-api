@@ -27,7 +27,9 @@ async function bootstrap(configService: ConfigService) {
       },
     }),
   );
-  await app.useGlobalPipes(new ValidationPipe());
+  await app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+  }));
   await app.enableCors();
   await app.use(bodyParser.json({ limit: '100mb' }));
   await app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));

@@ -59,9 +59,10 @@ export class AuthService {
   }
 
   async profile(request: Request): Promise<User> {
+    const { userId } = request.session;
     return await this.userRepository.findOne({
       where: {
-        id: request.session.userId,
+        id: userId,
       },
     });
   }

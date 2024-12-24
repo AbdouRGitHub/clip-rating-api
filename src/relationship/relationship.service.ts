@@ -12,7 +12,7 @@ import {
 import { FindManyOptions, Like, Not, Repository } from 'typeorm';
 import { Request } from 'express';
 import { User } from 'src/user/entities/user.entity';
-import { FriendPaginationDto } from './dto/friend-pagination.dto';
+import { PaginationDto } from './dto/pagination.dto';
 
 @Injectable()
 export class RelationshipService {
@@ -71,17 +71,17 @@ export class RelationshipService {
     }
   }
 
-  async getFriendRequests(
-    friendpaginationDto: FriendPaginationDto,
-    request: Request,
-  ) {
-    const { page, limit, search } = friendpaginationDto;
+  async getFriendRequests(paginationDto: PaginationDto, request: Request) {
+    const { userId } = request.session;
+    const { page, limit, search } = paginationDto;
+
     const findOptions: FindManyOptions<Relationship> = {
       where: {
-        receiver: { id: request.session.userId },
+        receiver: { id: userId },
         status: RelationshipStatus.FRIEND_REQUEST,
       },
-      relations: ['sender', 'receiver'],
+      select: ['id', 'createdAt'],
+      relations: ['sender'],
       take: limit,
       skip: (page - 1) * limit,
       order: { createdAt: 'DESC' },
@@ -97,28 +97,54 @@ export class RelationshipService {
     try {
       return await this.relationshipRepository.findAndCount(findOptions);
     } catch (err) {
-      throw new InternalServerErrorException('An unexpected error occurred');
+      throw new InternalServerErrorException('An unexpected error occurred: ');
+    }
+  }
+
+  async getSentFriendRequests(paginationDto: PaginationDto, request: Request) {
+    const { userId } = request.session;
+    const { page, limit, search } = paginationDto;
+
+    const findOptions: FindManyOptions<Relationship> = {
+      where: {
+        sender: { id: userId },
+        status: RelationshipStatus.FRIEND_REQUEST,
+      },
+      select: ['id', 'createdAt'],
+      relations: ['receiver'],
+      take: limit,
+      skip: (page - 1) * limit,
+      order: { createdAt: 'DESC' },
+    };
+
+    if (search) {
+      findOptions.where = {
+        ...findOptions.where,
+        sender: { username: Like(`%${search}%`) },
+      };
+    }
+
+    try {
+      return await this.relationshipRepository.findAndCount(findOptions);
+    } catch (err) {
+      throw new InternalServerErrorException('An unexpected error occurred: ');
     }
   }
 
   async getFriendRequest(friendRequestId: string, request: Request) {
     const { userId } = request.session;
 
-    if (!friendRequestId) {
-      throw new BadRequestException('Friend request not found');
-    }
-    try {
-      return await this.relationshipRepository.findOne({
+    const friendRequest: Relationship =
+      await this.relationshipRepository.findOne({
         where: {
           id: friendRequestId,
           receiver: { id: userId },
           status: RelationshipStatus.FRIEND_REQUEST,
         },
-        relations: ['sender', 'receiver'],
+        relations: ['sender'],
       });
-    } catch (err) {
-      throw new InternalServerErrorException('An unexpected error occurred');
-    }
+
+    return await friendRequest;
   }
 
   async acceptFriendRequest(friendRequestId: string, request: Request) {
@@ -219,6 +245,34 @@ export class RelationshipService {
         status: RelationshipStatus.BLOCKED,
       });
       return;
+    } catch (err) {
+      throw new InternalServerErrorException('An unexpected error occurred');
+    }
+  }
+
+  async getFriends(paginationDto: PaginationDto, request: Request) {
+    const { userId } = request.session;
+    const { page, limit, search } = paginationDto;
+    const findOptions: FindManyOptions<Relationship> = {
+      where: {
+        receiver: { id: userId },
+        status: RelationshipStatus.FRIEND,
+      },
+      relations: ['sender', 'receiver'],
+      take: limit,
+      skip: (page - 1) * limit,
+      order: { createdAt: 'DESC' },
+    };
+
+    if (search) {
+      findOptions.where = {
+        ...findOptions.where,
+        sender: { username: Like(`%${search}%`) },
+      };
+    }
+
+    try {
+      return await this.relationshipRepository.findAndCount(findOptions);
     } catch (err) {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
