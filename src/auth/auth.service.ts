@@ -5,7 +5,7 @@ import {
   Res,
   UnauthorizedException,
 } from '@nestjs/common';
-import { User } from 'src/user/entities/user.entity';
+import { User, UserRole } from 'src/user/entities/user.entity';
 import { Request, Response } from 'express';
 import { AuthDto } from './dto/auth.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,7 +18,7 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async login(authDto: AuthDto, @Req() request: Request) {
+  async login(authDto: AuthDto, request: Request): Promise<string> {
     const user = await this.userRepository.findOne({
       where: {
         email: authDto.email,
@@ -43,7 +43,7 @@ export class AuthService {
     return 'Login successful';
   }
 
-  async logout(@Req() request: Request, @Res() response: Response) {
+  async logout(request: Request, response: Response): Promise<void> {
     try {
       await new Promise<void>((resolve, reject) => {
         request.session.destroy((err) => {
@@ -58,7 +58,7 @@ export class AuthService {
     }
   }
 
-  async profile(@Req() request: Request) {
+  async profile(request: Request): Promise<User> {
     return await this.userRepository.findOne({
       where: {
         id: request.session.userId,
@@ -66,7 +66,7 @@ export class AuthService {
     });
   }
 
-  async getUserRole(@Req() request: Request) {
+  async getUserRole(request: Request): Promise<UserRole> {
     const { userId } = request.session;
     const user = await this.userRepository.findOne({
       where: { id: userId },
