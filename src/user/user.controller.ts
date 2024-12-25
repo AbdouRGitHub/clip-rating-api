@@ -14,9 +14,10 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { PaginationDto } from './dto/pagination.dto';
+import { Roles } from 'src/auth/decorator/roles.decorator';
 
 @Controller('user')
 export class UserController {
@@ -28,6 +29,7 @@ export class UserController {
   }
 
   @Get()
+  @Roles([UserRole.USER])
   findAll(
     @Query() paginationDto: PaginationDto,
     @Req() request: Request,
@@ -36,18 +38,21 @@ export class UserController {
   }
 
   @Get(':id')
+  @Roles([UserRole.USER])
   findOne(@Param('id') id: string, @Req() request: Request): Promise<User> {
     return this.userService.findOne(id, request);
   }
 
   @Patch()
   @HttpCode(204)
+  @Roles([UserRole.USER])
   update(@Body() updateUserDto: UpdateUserDto, @Req() request: Request) {
     return this.userService.update(updateUserDto, request);
   }
 
   @Patch('password')
   @HttpCode(204)
+  @Roles([UserRole.USER])
   updatePassword(
     @Body() updatePasswordDto: UpdatePasswordDto,
     @Req() request: Request,
@@ -57,6 +62,7 @@ export class UserController {
 
   @Delete()
   @HttpCode(204)
+  @Roles([UserRole.USER])
   remove(@Req() request: Request) {
     return this.userService.remove(request);
   }
