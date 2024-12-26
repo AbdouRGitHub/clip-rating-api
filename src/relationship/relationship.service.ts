@@ -127,7 +127,7 @@ export class RelationshipService {
     try {
       return await this.relationshipRepository.findAndCount(findOptions);
     } catch (err) {
-      throw new InternalServerErrorException('An unexpected error occurred: ');
+      throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
 
@@ -239,7 +239,7 @@ export class RelationshipService {
 
     try {
       await this.relationshipRepository.remove(undesiredRelationships);
-      return await this.relationshipRepository.save({
+      await this.relationshipRepository.save({
         sender: { id: userId },
         receiver: { id: receiverId },
         status: RelationshipStatus.BLOCKED,
