@@ -97,7 +97,7 @@ export class RelationshipService {
     try {
       return await this.relationshipRepository.findAndCount(findOptions);
     } catch (err) {
-      throw new InternalServerErrorException('An unexpected error occurred: ');
+      throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
 
