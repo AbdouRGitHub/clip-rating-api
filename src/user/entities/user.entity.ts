@@ -3,12 +3,15 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Relationship } from 'src/relationship/entities/relationship.entity';
+import { Playlist } from 'src/playlist/entities/playlist.entity';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -33,7 +36,6 @@ export class User {
     type: 'enum',
     enum: UserRole,
     default: UserRole.USER,
-    select: false,
   })
   role: UserRole;
 
@@ -49,6 +51,13 @@ export class User {
   @OneToMany(() => Relationship, (relation) => relation.receiver)
   receivedRelationships: Relationship[];
 
+  @OneToMany(() => Playlist, (playlist) => playlist.user)
+  playlists: Playlist[];
+
+  @ManyToMany(() => Playlist, playlist => playlist.likedBy)
+  @JoinTable()
+  likedPlaylists: Playlist[];
+  
   @BeforeInsert()
   private async hashPassword(): Promise<void> {
     if (this.password) {

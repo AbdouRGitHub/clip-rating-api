@@ -1,15 +1,19 @@
+import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  ManyToMany,
 } from 'typeorm';
 
 @Entity()
 export class Playlist {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
@@ -17,15 +21,15 @@ export class Playlist {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ default: true })
-  isPublic: boolean;
-
-  @Column({ type: 'float', default: 0, precision: 3, scale: 1 })
-  rating: number;
-
-  @CreateDateColumn()
+  @CreateDateColumn({ select: false })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ select: false })
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.playlists)
+  user: User;
+
+  @ManyToMany(() => User, user => user.likedPlaylists)
+  likedBy: User[];
 }
