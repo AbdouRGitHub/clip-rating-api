@@ -18,10 +18,4 @@ export class AuthController {
   async logout(@Req() request: Request, @Res() response: Response) {
     return await this.authService.logout(request, response);
   }
-
-  @Roles([UserRole.USER, UserRole.ADMIN])
-  @Get('profile')
-  async profile(@Req() request: Request) {
-    return await this.authService.profile(request);
-  }
 }

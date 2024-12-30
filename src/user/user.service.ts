@@ -126,6 +126,15 @@ export class UserService {
     }
   }
 
+  async profile(request: Request): Promise<User> {
+    const { userId } = request.session;
+    return await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+  }
+  
   async remove(@Req() request: Request) {
     const { userId } = request.session;
 

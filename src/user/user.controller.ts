@@ -60,6 +60,12 @@ export class UserController {
     return this.userService.updatePassword(updatePasswordDto, request);
   }
 
+  @Get('profile')
+  @Roles([UserRole.USER, UserRole.ADMIN])
+  profile(@Req() request: Request): Promise<User> {
+    return this.userService.profile(request);
+  }
+
   @Delete()
   @HttpCode(204)
   @Roles([UserRole.USER])
