@@ -22,7 +22,7 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    let user: User = await this.userRepository.create(createUserDto);
+    const user: User = await this.userRepository.create(createUserDto);
 
     //check if the password and confirmPassword match
     if (createUserDto.password !== createUserDto.confirmPassword) {
@@ -44,7 +44,7 @@ export class UserService {
     }
 
     try {
-      let userCreated = await this.userRepository.save(user);
+      const userCreated = await this.userRepository.save(user);
       delete userCreated.password;
       return await userCreated;
     } catch (error) {
