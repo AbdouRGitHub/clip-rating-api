@@ -30,6 +30,6 @@ export class Playlist {
   @ManyToOne(() => User, (user) => user.playlists)
   user: User;
 
-  @ManyToMany(() => User, user => user.likedPlaylists)
+  @ManyToMany(() => User, (user) => user.likedPlaylists)
   likedBy: User[];
 }
