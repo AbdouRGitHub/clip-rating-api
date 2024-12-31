@@ -12,6 +12,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { Relationship } from 'src/relationship/entities/relationship.entity';
 import { Playlist } from 'src/playlist/entities/playlist.entity';
+import { Matches } from 'class-validator';
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -23,7 +24,10 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ length: 20 })
+  @Column({ length: 20, unique: true })
+  @Matches(/^[a-z0-9_]+$/, {
+    message: 'Username can only contain lowercase letters, numbers, and underscores.',
+  })
   username: string;
 
   @Column({ unique: true })
@@ -54,10 +58,10 @@ export class User {
   @OneToMany(() => Playlist, (playlist) => playlist.user)
   playlists: Playlist[];
 
-  @ManyToMany(() => Playlist, playlist => playlist.likedBy)
+  @ManyToMany(() => Playlist, (playlist) => playlist.likedBy)
   @JoinTable()
   likedPlaylists: Playlist[];
-  
+
   @BeforeInsert()
   private async hashPassword(): Promise<void> {
     if (this.password) {

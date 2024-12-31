@@ -4,12 +4,16 @@ import {
   IsString,
   IsStrongPassword,
   Length,
+  Matches,
 } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
   @Length(6, 20)
   @IsNotEmpty()
+  @Matches(/^[a-z0-9_]+$/, {
+    message: 'Username can only contain lowercase letters, numbers, and underscores.',
+  })
   username: string;
 
   @IsEmail()
