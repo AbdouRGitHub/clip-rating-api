@@ -23,7 +23,7 @@ async function bootstrap(configService: ConfigService) {
       cookie: {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        secure: configService.get('NODE_ENV') === 'production',
+        secure: configService.get('SECURE_COOKIE') === 'production',
       },
     }),
   );
