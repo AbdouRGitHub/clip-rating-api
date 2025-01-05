@@ -10,6 +10,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "start:staging": "cross-env NODE_ENV=staging nest start",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -19,10 +20,15 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "npm run build && ts-node ./node_modules/typeorm/cli.js",
+    "typeorm:staging": "npm run build && cross-env NODE_ENV=staging ts-node ./node_modules/typeorm/cli.js",
     "migration:generate": "npm run typeorm -- migration:generate -d database/config",
+    "migration:generate:staging": "npm run typeorm:staging -- migration:generate -d database/config",
     "migration:create": "npm run typeorm -- migration:create -d database/config",
-    "migration:run": "npm run typeorm -- migration:run -d database/config.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d database/config"
+    "migration:create:staging": "npm run typeorm:staging -- migration:create -d database/config",
+    "migration:run": "npm run typeorm -- migration:run -d database/config",
+    "migration:run:staging": "npm run typeorm:staging -- migration:run -d database/config",
+    "migration:revert": "npm run typeorm -- migration:revert -d database/config",
+    "migration:revert:staging": "npm run typeorm:staging -- migration:revert -d database/config"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -59,6 +65,7 @@
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",

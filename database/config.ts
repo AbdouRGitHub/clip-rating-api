@@ -1,7 +1,10 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
+
+const envFile = process.env.NODE_ENV === 'staging' ? '.env.staging' : '.env';
+dotenv.config({ path: envFile });
 
 const configService = new ConfigService();
 
