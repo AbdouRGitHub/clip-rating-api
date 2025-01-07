@@ -1,8 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  Req,
-  Res,
   UnauthorizedException,
 } from '@nestjs/common';
 import { User, UserRole } from 'src/user/entities/user.entity';
@@ -53,7 +51,7 @@ export class AuthService {
       });
       response.clearCookie('session_nest');
       response.sendStatus(204);
-    } catch (error) {
+    } catch {
       response.status(500);
     }
   }

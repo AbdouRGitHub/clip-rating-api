@@ -35,7 +35,7 @@ export class PlaylistService {
     try {
       await this.playlistRepository.save(playlist);
       return;
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -66,7 +66,7 @@ export class PlaylistService {
 
     try {
       return await this.playlistRepository.findAndCount(findOptions);
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -95,7 +95,7 @@ export class PlaylistService {
 
     try {
       return await this.playlistRepository.findAndCount(findOptions);
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -119,7 +119,7 @@ export class PlaylistService {
     try {
       await this.playlistRepository.save(playlist);
       return;
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -213,7 +213,7 @@ export class PlaylistService {
     try {
       await this.playlistRepository.remove(playlist);
       return;
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }

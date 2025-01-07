@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ClipService } from './clip.service';
 import { CreateClipDto } from './dto/create-clip.dto';
 import { UpdateClipDto } from './dto/update-clip.dto';

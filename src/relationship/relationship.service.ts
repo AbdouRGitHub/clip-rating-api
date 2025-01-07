@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  Req,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
@@ -66,7 +65,7 @@ export class RelationshipService {
     try {
       await this.relationshipRepository.save(friendRequest);
       return;
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -96,7 +95,7 @@ export class RelationshipService {
 
     try {
       return await this.relationshipRepository.findAndCount(findOptions);
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -126,7 +125,7 @@ export class RelationshipService {
 
     try {
       return await this.relationshipRepository.findAndCount(findOptions);
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -166,7 +165,7 @@ export class RelationshipService {
     try {
       await this.relationshipRepository.save(friendRequest);
       return;
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -189,7 +188,7 @@ export class RelationshipService {
     try {
       await this.relationshipRepository.remove(friendRequest);
       return;
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -245,7 +244,7 @@ export class RelationshipService {
         status: RelationshipStatus.BLOCKED,
       });
       return;
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
@@ -273,7 +272,7 @@ export class RelationshipService {
 
     try {
       return await this.relationshipRepository.findAndCount(findOptions);
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }

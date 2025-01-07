@@ -12,7 +12,8 @@ export class CreateUserDto {
   @Length(6, 20)
   @IsNotEmpty()
   @Matches(/^[a-z0-9_]+$/, {
-    message: 'Username can only contain lowercase letters, numbers, and underscores.',
+    message:
+      'Username can only contain lowercase letters, numbers, and underscores.',
   })
   username: string;
 

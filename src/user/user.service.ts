@@ -134,7 +134,7 @@ export class UserService {
       },
     });
   }
-  
+
   async remove(@Req() request: Request) {
     const { userId } = request.session;
 
