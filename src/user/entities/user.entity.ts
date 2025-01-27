@@ -26,7 +26,8 @@ export class User {
 
   @Column({ length: 20, unique: true })
   @Matches(/^[a-z0-9_]+$/, {
-    message: 'Username can only contain lowercase letters, numbers, and underscores.',
+    message:
+      'Username can only contain lowercase letters, numbers, and underscores.',
   })
   username: string;
 
@@ -42,6 +43,9 @@ export class User {
     default: UserRole.USER,
   })
   role: UserRole;
+
+  @Column({ nullable: true })
+  avatar_path: string;
 
   @CreateDateColumn({ select: false })
   readonly createdAt: Date;

@@ -9,6 +9,11 @@ import {
   Req,
   HttpCode,
   Query,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,14 +23,28 @@ import { User, UserRole } from './entities/user.entity';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { Roles } from 'src/auth/decorator/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.create(createUserDto);
+  @UseInterceptors(FileInterceptor('avatar'))
+  create(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 8388608 }),
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    avatar: Express.Multer.File,
+  ): Promise<User> {
+    return this.userService.create(createUserDto, avatar);
   }
 
   @Get()
