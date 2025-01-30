@@ -1,3 +1,4 @@
+import { Clip } from 'src/clip/entities/clip.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Entity,
@@ -7,6 +8,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
   ManyToMany,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -31,4 +33,7 @@ export class Playlist {
 
   @ManyToMany(() => User, (user) => user.likedPlaylists)
   likedBy: User[];
+
+  @OneToMany(() => Clip, (clip) => clip.playlist)
+  clips: Clip[];
 }
