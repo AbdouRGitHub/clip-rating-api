@@ -36,7 +36,8 @@ export class UserService {
     avatar: Express.Multer.File,
   ): Promise<User> {
     const queryRunner: QueryRunner = await this.dataSource.createQueryRunner();
-    const user: User = await this.userRepository.create(createUserDto);
+    await queryRunner.connect();
+    const user: User = await queryRunner.manager.create(User, createUserDto);
     let avatarFullPath: string;
 
     //check if the password and confirmPassword match
@@ -58,7 +59,6 @@ export class UserService {
       throw new BadRequestException('Username already exists');
     }
 
-    await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
       const userCreated: User = await queryRunner.manager.save(User, user);
