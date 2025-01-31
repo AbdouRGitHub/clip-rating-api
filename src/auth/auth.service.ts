@@ -38,7 +38,7 @@ export class AuthService {
     }
 
     request.session.userId = user.id;
-    return 'Login successful';
+    return;
   }
 
   async logout(request: Request, response: Response): Promise<void> {
