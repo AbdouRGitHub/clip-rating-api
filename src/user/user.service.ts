@@ -65,7 +65,7 @@ export class UserService {
       if (avatar) {
         const { data, error } = await this.supabase.storage
           .from(this.configService.get('SUPABASE_AVATAR_BUCKET'))
-          .upload(`${userCreated.id}/avatar1.png`, avatar.buffer, {
+          .upload(`${userCreated.id}/${avatar.originalname}`, avatar.buffer, {
             cacheControl: '3600',
             upsert: false,
             contentType: avatar.mimetype,
