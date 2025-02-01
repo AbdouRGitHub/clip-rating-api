@@ -30,6 +30,7 @@ async function bootstrap(configService: ConfigService) {
   await app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
+      whitelist: true,
     }),
   );
   await app.enableCors();
