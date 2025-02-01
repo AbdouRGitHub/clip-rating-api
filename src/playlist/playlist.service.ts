@@ -40,67 +40,41 @@ export class PlaylistService {
     }
   }
 
-  async getMyPlaylists(
-    paginationDto: PaginationDto,
-    request: Request,
-  ): Promise<[Playlist[], number]> {
-    const { userId } = request.session;
-    const { page, limit, search } = paginationDto;
-
-    const findOptions: FindManyOptions<Playlist> = {
-      where: {
-        user: { id: userId },
-      },
-      relations: ['sender'],
-      take: limit,
-      skip: (page - 1) * limit,
-      order: { createdAt: 'DESC' },
-    };
-
-    if (search) {
-      findOptions.where = {
-        ...findOptions.where,
-        name: Like(`%${search}%`),
-      };
-    }
+  async findAll(paginationDto: PaginationDto): Promise<[Playlist[], number]> {
+    const { page, limit } = paginationDto;
 
     try {
-      return await this.playlistRepository.findAndCount(findOptions);
+      return await this.playlistRepository.findAndCount({
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+          user: {
+            id: true,
+            username: true,
+            avatar_path: true,
+          },
+        },
+        relations: ['user'],
+        take: limit,
+        skip: (page - 1) * limit,
+        order: { createdAt: 'DESC' },
+      });
     } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
   }
 
-  async getUserPlaylists(
-    userId: string,
-    paginationDto: PaginationDto,
-  ): Promise<[Playlist[], number]> {
-    const { page, limit, search } = paginationDto;
-
-    const findOptions: FindManyOptions<Playlist> = {
-      where: {
-        user: { id: userId },
-      },
-      take: limit,
-      skip: (page - 1) * limit,
-      order: { createdAt: 'DESC' },
-    };
-
-    if (search) {
-      findOptions.where = {
-        ...findOptions.where,
-        name: Like(`%${search}%`),
-      };
-    }
-
+  async findOne(playlistId: string): Promise<Playlist> {
     try {
-      return await this.playlistRepository.findAndCount(findOptions);
-    } catch {
-      throw new InternalServerErrorException('An unexpected error occurred');
+      return await this.playlistRepository.findOneBy({ id: playlistId });
+    } catch (err) {
+      throw new InternalServerErrorException(`An unexpected error occurred`);
     }
   }
 
-  async updatePlaylist(
+  async update(
     playlistId: string,
     updatePlaylistDto: UpdatePlaylistDto,
     request: Request,
@@ -199,7 +173,7 @@ export class PlaylistService {
     }
   }
 
-  async deletePlaylist(playlistId: string, request: Request) {
+  async remove(playlistId: string, request: Request) {
     const { userId } = request.session;
 
     const playlist = await this.playlistRepository.findOne({

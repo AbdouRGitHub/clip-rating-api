@@ -34,31 +34,27 @@ export class PlaylistController {
 
   @Get()
   @Roles([UserRole.USER])
-  getMyPlaylists(
+  findAll(
     @Query() paginationDto: PaginationDto,
-    @Req() request: Request,
   ): Promise<[Playlist[], number]> {
-    return this.playlistService.getMyPlaylists(paginationDto, request);
+    return this.playlistService.findAll(paginationDto);
   }
 
-  @Get()
+  @Get(':id')
   @Roles([UserRole.USER])
-  getUserPlaylists(
-    @Body('userId') id: string,
-    paginationDto: PaginationDto,
-  ): Promise<[Playlist[], number]> {
-    return this.playlistService.getUserPlaylists(id, paginationDto);
+  findOne(@Param('id') playlistId: string): Promise<Playlist> {
+    return this.playlistService.findOne(playlistId);
   }
 
   @Patch(':id')
   @Roles([UserRole.USER])
   @HttpCode(204)
-  updatePlaylist(
+  update(
     @Param('id') playlistId: string,
     @Body() updatePlaylistDto: UpdatePlaylistDto,
     @Req() request: Request,
   ): Promise<void> {
-    return this.playlistService.updatePlaylist(
+    return this.playlistService.update(
       playlistId,
       updatePlaylistDto,
       request,
@@ -67,7 +63,7 @@ export class PlaylistController {
 
   @Delete(':id')
   @Roles([UserRole.USER])
-  deletePlaylist(@Param('id') playlistId: string, @Req() request: Request) {
-    return this.playlistService.deletePlaylist(playlistId, request);
+  remove(@Param('id') playlistId: string, @Req() request: Request) {
+    return this.playlistService.remove(playlistId, request);
   }
 }

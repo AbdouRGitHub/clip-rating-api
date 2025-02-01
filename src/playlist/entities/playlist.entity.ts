@@ -9,6 +9,7 @@ import {
   ManyToOne,
   ManyToMany,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -23,12 +24,13 @@ export class Playlist {
   description: string;
 
   @CreateDateColumn({ select: false })
-  createdAt: Date;
+  readonly createdAt: Date;
 
   @UpdateDateColumn({ select: false })
-  updatedAt: Date;
+  readonly updatedAt: Date;
 
   @ManyToOne(() => User, (user) => user.playlists)
+  @JoinColumn({ name: 'ownerId' })
   user: User;
 
   @ManyToMany(() => User, (user) => user.likedPlaylists)
