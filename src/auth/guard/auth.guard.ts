@@ -39,7 +39,7 @@ export class AuthGuard implements CanActivate {
 
     //check if the user session exists
     if (!request.session.userId) {
-      throw new UnauthorizedException('SESSION_NOT_FOUND');
+      throw new UnauthorizedException('SESSION_NOT_FOUND_OR_EXPIRED');
     }
 
     //get the user from the session
