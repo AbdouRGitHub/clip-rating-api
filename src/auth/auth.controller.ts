@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Req,
+  Res,
+  Session,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { Request, Response } from 'express';
@@ -15,5 +25,13 @@ export class AuthController {
   @Delete('logout')
   async logout(@Req() request: Request, @Res() response: Response) {
     return await this.authService.logout(request, response);
+  }
+
+  @Get('check-session')
+  checkSession(@Session() session: Record<string, any>)  {
+    if (!session || !session.userId) {
+      return false
+    }
+    return true;
   }
 }

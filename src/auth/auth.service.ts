@@ -69,5 +69,4 @@ export class AuthService {
 
     return user.role;
   }
-  
 }
