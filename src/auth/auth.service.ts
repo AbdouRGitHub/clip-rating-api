@@ -16,16 +16,16 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async login(authDto: AuthDto, request: Request): Promise<string> {
+  async login(authDto: AuthDto, request: Request): Promise<void> {
     const user = await this.userRepository.findOne({
       where: {
         email: authDto.email,
       },
-      select: ['id', 'email', 'password', 'role'],
+      select: ['id', 'email', 'password'],
     });
 
     if (!user) {
-      throw new BadRequestException('Invalid credentials');
+      throw new UnauthorizedException('Email or password is incorrect');
     }
 
     const isPasswordMatch: boolean = await bcrypt.compare(
@@ -34,7 +34,7 @@ export class AuthService {
     );
 
     if (!isPasswordMatch) {
-      throw new BadRequestException('Invalid credentials');
+      throw new UnauthorizedException('Email or password is incorrect');
     }
 
     request.session.userId = user.id;
@@ -56,15 +56,6 @@ export class AuthService {
     }
   }
 
-  async profile(request: Request): Promise<User> {
-    const { userId } = request.session;
-    return await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-    });
-  }
-
   async getUserRole(request: Request): Promise<UserRole> {
     const { userId } = request.session;
     const user = await this.userRepository.findOne({
@@ -78,4 +69,5 @@ export class AuthService {
 
     return user.role;
   }
+  
 }

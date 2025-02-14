@@ -117,6 +117,16 @@ export class UserService {
       throw new InternalServerErrorException(err.message);
     }
   }
+  
+  async profile(request: Request): Promise<User> {
+    const { userId } = request.session;
+
+    return await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+    });
+  }
 
   async update(updateUserDto: UpdateUserDto, request: Request) {
     const { userId } = request.session;
@@ -165,15 +175,6 @@ export class UserService {
     } catch (err) {
       throw new BadRequestException(err);
     }
-  }
-
-  async profile(request: Request): Promise<User> {
-    const { userId } = request.session;
-    return await this.userRepository.findOne({
-      where: {
-        id: userId,
-      },
-    });
   }
 
   async remove(@Req() request: Request) {

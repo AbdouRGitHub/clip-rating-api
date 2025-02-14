@@ -56,12 +56,18 @@ export class UserController {
   ): Promise<[User[], number]> {
     return this.userService.findAll(paginationDto, request);
   }
+  @Get('profile')
+  @Roles([UserRole.USER])
+  profile(@Req() request: Request): Promise<User> {
+    return this.userService.profile(request);
+  }
 
   @Get(':id')
   @Roles([UserRole.USER])
   findOne(@Param('id') id: string, @Req() request: Request): Promise<User> {
     return this.userService.findOne(id, request);
   }
+
 
   @Patch()
   @HttpCode(204)
@@ -78,12 +84,6 @@ export class UserController {
     @Req() request: Request,
   ) {
     return this.userService.updatePassword(updatePasswordDto, request);
-  }
-
-  @Get('profile')
-  @Roles([UserRole.USER, UserRole.ADMIN])
-  profile(@Req() request: Request): Promise<User> {
-    return this.userService.profile(request);
   }
 
   @Delete()
