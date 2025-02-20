@@ -10,7 +10,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Relationship } from 'src/relationship/entities/relationship.entity';
 import { Playlist } from 'src/playlist/entities/playlist.entity';
 import { Matches } from 'class-validator';
 
@@ -52,12 +51,6 @@ export class User {
 
   @UpdateDateColumn({ select: false })
   readonly updatedAt: Date;
-
-  @OneToMany(() => Relationship, (relation) => relation.sender)
-  initiatedRelationships: Relationship[];
-
-  @OneToMany(() => Relationship, (relation) => relation.receiver)
-  receivedRelationships: Relationship[];
 
   @OneToMany(() => Playlist, (playlist) => playlist.user)
   playlists: Playlist[];

@@ -8,7 +8,6 @@ import { databaseConfig } from 'database/config';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
-import { RelationshipModule } from './relationship/relationship.module';
 import { PlaylistModule } from './playlist/playlist.module';
 import { ClipModule } from './clip/clip.module';
 
@@ -21,7 +20,6 @@ import { ClipModule } from './clip/clip.module';
     TypeOrmModule.forRoot(databaseConfig),
     UserModule,
     AuthModule,
-    RelationshipModule,
     PlaylistModule,
     ClipModule,
   ],
