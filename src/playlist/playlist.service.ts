@@ -40,27 +40,32 @@ export class PlaylistService {
     }
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<[Playlist[], number]> {
+  async findAll(paginationDto: PaginationDto): Promise<{
+    data: Playlist[];
+    total: number;
+    page: number;
+    lastPage: number;
+}> {
     const { page, limit } = paginationDto;
 
     try {
-      return await this.playlistRepository.findAndCount({
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          createdAt: true,
-          user: {
-            id: true,
-            username: true,
-            avatar_path: true,
-          },
-        },
-        relations: ['user'],
-        take: limit,
-        skip: (page - 1) * limit,
-        order: { createdAt: 'DESC' },
-      });
+      const [playlists, total]: [Playlist[], number] =
+        await this.playlistRepository
+          .createQueryBuilder('playlist')
+          .leftJoinAndSelect('playlist.user', 'user')
+          .leftJoinAndSelect('playlist.likedBy', 'likedBy')
+          .loadRelationCountAndMap('playlist.likesCount', 'playlist.likedBy')
+          .take(limit)
+          .skip((page - 1) * limit)
+          .orderBy('playlist.createdAt', 'DESC')
+          .getManyAndCount();
+
+      return {
+        data: playlists,
+        total: total,
+        page: page,
+        lastPage: Math.ceil(total / limit),
+      };
     } catch {
       throw new InternalServerErrorException('An unexpected error occurred');
     }
@@ -71,6 +76,34 @@ export class PlaylistService {
       return await this.playlistRepository.findOneBy({ id: playlistId });
     } catch (err) {
       throw new InternalServerErrorException(`An unexpected error occurred`);
+    }
+  }
+
+  async toggleLike(playlistId: string, request: Request): Promise<string> {
+    const { userId } = request.session;
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['likedPlaylists'],
+    });
+    const playlist = await this.playlistRepository.findOne({
+      where: { id: playlistId },
+      relations: ['likedBy'],
+    });
+
+    if (!user || !playlist) throw new Error('User or Playlist not found');
+
+    const alreadyLiked = user.likedPlaylists.some((p) => p.id === playlistId);
+
+    if (alreadyLiked) {
+      user.likedPlaylists = user.likedPlaylists.filter(
+        (p) => p.id !== playlistId,
+      );
+      await this.userRepository.save(user);
+      return 'Like removed';
+    } else {
+      user.likedPlaylists.push(playlist);
+      await this.userRepository.save(user);
+      return 'Playlist liked';
     }
   }
 
@@ -92,81 +125,6 @@ export class PlaylistService {
 
     try {
       await this.playlistRepository.save(playlist);
-      return;
-    } catch {
-      throw new InternalServerErrorException('An unexpected error occurred');
-    }
-  }
-
-  async likePlaylist(playlistId: string, request: Request) {
-    const { userId } = request.session;
-
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const playlist = await this.playlistRepository.findOne({
-      where: { id: playlistId },
-    });
-
-    if (!playlist) {
-      throw new NotFoundException('Playlist not found');
-    }
-
-    if (
-      user.likedPlaylists.some(
-        (likedPlaylist) => likedPlaylist.id === playlist.id,
-      )
-    ) {
-      throw new NotFoundException('User has already liked this playlist');
-    }
-    user.likedPlaylists.push(playlist);
-
-    try {
-      await this.userRepository.save(user);
-      return;
-    } catch {
-      throw new InternalServerErrorException('An unexpected error occurred');
-    }
-  }
-
-  async unlikePlaylist(playlistId: string, request: Request) {
-    const { userId } = request.session;
-
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const playlist = await this.playlistRepository.findOne({
-      where: { id: playlistId },
-    });
-
-    if (!playlist) {
-      throw new NotFoundException('Playlist not found');
-    }
-
-    if (
-      !user.likedPlaylists.some(
-        (likedPlaylist) => likedPlaylist.id === playlist.id,
-      )
-    ) {
-      throw new NotFoundException('User has not liked this playlist');
-    }
-
-    user.likedPlaylists = user.likedPlaylists.filter(
-      (likedPlaylist) => likedPlaylist.id !== playlist.id,
-    );
-
-    try {
-      await this.userRepository.save(user);
       return;
     } catch {
       throw new InternalServerErrorException('An unexpected error occurred');

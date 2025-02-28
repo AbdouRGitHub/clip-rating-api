@@ -32,11 +32,20 @@ export class PlaylistController {
     return this.playlistService.create(createPlaylistDto, request);
   }
 
+  @Post(':id/like')
+  @Roles([UserRole.USER])
+  toggleLike(@Param('id') playlistId: string, @Req() request: Request) {
+    return this.playlistService.toggleLike(playlistId, request);
+  }
+
   @Get()
   @Roles([UserRole.USER])
-  findAll(
-    @Query() paginationDto: PaginationDto,
-  ): Promise<[Playlist[], number]> {
+  findAll(@Query() paginationDto: PaginationDto): Promise<{
+    data: Playlist[];
+    total: number;
+    page: number;
+    lastPage: number;
+  }> {
     return this.playlistService.findAll(paginationDto);
   }
 
@@ -54,11 +63,7 @@ export class PlaylistController {
     @Body() updatePlaylistDto: UpdatePlaylistDto,
     @Req() request: Request,
   ): Promise<void> {
-    return this.playlistService.update(
-      playlistId,
-      updatePlaylistDto,
-      request,
-    );
+    return this.playlistService.update(playlistId, updatePlaylistDto, request);
   }
 
   @Delete(':id')

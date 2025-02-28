@@ -56,9 +56,8 @@ export class User {
   playlists: Playlist[];
 
   @ManyToMany(() => Playlist, (playlist) => playlist.likedBy)
-  @JoinTable()
   likedPlaylists: Playlist[];
-
+  
   @BeforeInsert()
   private async hashPassword(): Promise<void> {
     if (this.password) {
