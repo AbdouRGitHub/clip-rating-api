@@ -69,4 +69,12 @@ export class AuthService {
 
     return user.role;
   }
+
+  async authInfo(request: Request): Promise<User> {
+    const { userId } = request.session;
+    return await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'email', 'username'],
+    });
+  }
 }

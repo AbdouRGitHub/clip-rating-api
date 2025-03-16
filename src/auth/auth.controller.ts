@@ -34,4 +34,9 @@ export class AuthController {
     }
     return true;
   }
+
+  @Get('info')
+  async authInfo(@Req() request: Request) {
+    return await this.authService.authInfo(request);
+  }
 }
