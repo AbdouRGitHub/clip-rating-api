@@ -33,7 +33,12 @@ async function bootstrap(configService: ConfigService) {
       whitelist: true,
     }),
   );
-  await app.enableCors();
+  await app.enableCors({
+    origin: [
+      'http://localhost:5173'
+    ],
+    credentials: true,
+  });
   await app.use(bodyParser.json({ limit: '100mb' }));
   await app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
   await app.use(cookieParser());
