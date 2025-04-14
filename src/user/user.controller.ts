@@ -64,8 +64,8 @@ export class UserController {
 
   @Get(':id')
   @Roles([UserRole.USER])
-  findOne(@Param('id') id: string, @Req() request: Request): Promise<User> {
-    return this.userService.findOne(id, request);
+  findOne(@Param('id') id: string): Promise<User> {
+    return this.userService.findOne(id);
   }
 
   @Patch()
