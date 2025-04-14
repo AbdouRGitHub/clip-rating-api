@@ -47,8 +47,9 @@ export class ClipController {
   }
 
   @Get()
-  findAll(@Param('playlistId') playlistId: string) {
-    return this.clipService.findAll(playlistId);
+  getPlaylistClips(@Param('playlistId') playlistId: string) {
+    console.log('playlistId');
+    return this.clipService.getPlaylistClips(playlistId);
   }
 
   @Get(':id')

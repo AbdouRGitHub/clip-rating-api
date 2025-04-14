@@ -42,12 +42,7 @@ export class ClipService {
       where: {
         id: playlistId,
       },
-      select: {
-        id: true,
-        user: {
-          id: true,
-        },
-      },
+      select: ['id', 'user'],
     });
 
     if (!playlist) {
@@ -91,9 +86,13 @@ export class ClipService {
     return;
   }
 
-  findAll(playlistId: string) {
-    return this.playlistRepository.findBy({
-      id: playlistId,
+  getPlaylistClips(playlistId: string) {
+    return this.playlistRepository.find({
+      where: {
+        id: playlistId,
+      },
+      select: ['id', 'name', 'description', 'clips'],
+      relations: ['clips'],
     });
   }
 
