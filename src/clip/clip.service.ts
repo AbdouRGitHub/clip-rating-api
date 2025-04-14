@@ -37,9 +37,8 @@ export class ClipService {
   ) {
     const { userId } = request.session;
     let videoFullPath: string = '';
-    const queryRunner: QueryRunner = await this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    const playlist: Playlist = await queryRunner.manager.findOne(Playlist, {
+
+    const playlist: Playlist = await this.playlistRepository.findOne({
       relations: ['user'],
       where: {
         id: playlistId,
@@ -52,17 +51,21 @@ export class ClipService {
       },
     });
 
+    if (!playlist) {
+      throw new ForbiddenException('Playlist not found');
+    }
+
     if (playlist.user.id !== userId) {
       throw new ForbiddenException(
         'You do not have permission to add clips to this playlist',
       );
     }
-    const clip = queryRunner.manager.create(Clip, {
+
+    const clip = this.clipRepository.create({
       ...createClipDto,
       playlist: { id: playlistId },
     });
 
-    await queryRunner.startTransaction();
     try {
       const { data, error } = await this.supabase.storage
         .from(this.configService.get('SUPABASE_CLIP_BUCKET'))
@@ -76,19 +79,16 @@ export class ClipService {
       }
       videoFullPath = data.fullPath;
       clip.path = data.path;
-      await queryRunner.manager.save(Clip, clip);
-      await queryRunner.commitTransaction();
-    } catch {
-      await queryRunner.rollbackTransaction();
+      await this.clipRepository.save(clip);
+    } catch (error) {
       if (videoFullPath) {
         await this.supabase.storage
           .from(this.configService.get('SUPABASE_CLIP_BUCKET'))
           .remove([videoFullPath]);
       }
       throw new InternalServerErrorException('An unexpected error occurred');
-    } finally {
-      await queryRunner.release();
     }
+
     return;
   }
 

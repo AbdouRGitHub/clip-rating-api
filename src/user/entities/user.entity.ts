@@ -30,7 +30,7 @@ export class User {
   })
   username: string;
 
-  @Column({ unique: true, select: false })
+  @Column({ unique: true })
   email: string;
 
   @Column({ select: false })
@@ -57,7 +57,7 @@ export class User {
 
   @ManyToMany(() => Playlist, (playlist) => playlist.likedBy)
   likedPlaylists: Playlist[];
-  
+
   @BeforeInsert()
   private async hashPassword(): Promise<void> {
     if (this.password) {
