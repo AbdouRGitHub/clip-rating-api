@@ -7,17 +7,16 @@ import { CreateClipDto } from './dto/create-clip.dto';
 import { UpdateClipDto } from './dto/update-clip.dto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { ConfigService } from '@nestjs/config';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Clip } from './entities/clip.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { query, Request } from 'express';
+import { Request } from 'express';
 import { Playlist } from 'src/playlist/entities/playlist.entity';
 
 @Injectable()
 export class ClipService {
   private supabase: SupabaseClient;
   constructor(
-    private dataSource: DataSource,
     private readonly configService: ConfigService,
     @InjectRepository(Playlist)
     private readonly playlistRepository: Repository<Playlist>,
@@ -80,7 +79,7 @@ export class ClipService {
       videoFullPath = data.fullPath;
       clip.path = data.path;
       await this.clipRepository.save(clip);
-    } catch (error) {
+    } catch {
       if (videoFullPath) {
         await this.supabase.storage
           .from(this.configService.get('SUPABASE_CLIP_BUCKET'))

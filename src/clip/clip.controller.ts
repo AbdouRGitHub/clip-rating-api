@@ -6,25 +6,20 @@ import {
   Patch,
   Param,
   Delete,
-  ParseArrayPipe,
   Req,
-  UploadedFiles,
   ParseFilePipe,
   FileTypeValidator,
   MaxFileSizeValidator,
   UseInterceptors,
-  BadRequestException,
   UploadedFile,
-  Query,
 } from '@nestjs/common';
 import { ClipService } from './clip.service';
 import { CreateClipDto } from './dto/create-clip.dto';
 import { UpdateClipDto } from './dto/update-clip.dto';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { Roles } from 'src/auth/decorator/roles.decorator';
-import { User, UserRole } from 'src/user/entities/user.entity';
-import { ClipPaginationDto } from './dto/pagination.dto';
+import { UserRole } from 'src/user/entities/user.entity';
 
 @Controller('playlist/:playlistId/clip')
 export class ClipController {

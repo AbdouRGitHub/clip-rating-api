@@ -68,7 +68,6 @@ export class UserController {
     return this.userService.findOne(id, request);
   }
 
-
   @Patch()
   @HttpCode(204)
   @Roles([UserRole.USER])

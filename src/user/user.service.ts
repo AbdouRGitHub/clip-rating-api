@@ -8,7 +8,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { DataSource, In, Not, QueryRunner, Repository } from 'typeorm';
+import { DataSource, Not, QueryRunner, Repository } from 'typeorm';
 import { Request } from 'express';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import * as bcrypt from 'bcrypt';
@@ -110,14 +110,14 @@ export class UserService {
     }
   }
 
-  async findOne(id: string, request: Request): Promise<User> {
+  async findOne(id: string): Promise<User> {
     try {
       return await this.userRepository.findOneBy({ id });
     } catch (err) {
       throw new InternalServerErrorException(err.message);
     }
   }
-  
+
   async profile(request: Request): Promise<User> {
     const { userId } = request.session;
 

@@ -2,12 +2,11 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { Playlist } from './entities/playlist.entity';
-import { FindManyOptions, Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from './dto/pagination.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
@@ -45,7 +44,7 @@ export class PlaylistService {
     total: number;
     page: number;
     lastPage: number;
-}> {
+  }> {
     const { page, limit } = paginationDto;
 
     try {
@@ -74,7 +73,7 @@ export class PlaylistService {
   async findOne(playlistId: string): Promise<Playlist> {
     try {
       return await this.playlistRepository.findOneBy({ id: playlistId });
-    } catch (err) {
+    } catch {
       throw new InternalServerErrorException(`An unexpected error occurred`);
     }
   }

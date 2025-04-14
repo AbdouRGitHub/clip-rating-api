@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User, UserRole } from 'src/user/entities/user.entity';
 import { Request, Response } from 'express';
 import { AuthDto } from './dto/auth.dto';

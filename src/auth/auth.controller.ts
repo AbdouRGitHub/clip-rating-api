@@ -7,7 +7,6 @@ import {
   Req,
   Res,
   Session,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { AuthDto } from './dto/auth.dto';
 import { AuthService } from './auth.service';
@@ -28,9 +27,9 @@ export class AuthController {
   }
 
   @Get('check-session')
-  checkSession(@Session() session: Record<string, any>)  {
+  checkSession(@Session() session: Record<string, any>) {
     if (!session || !session.userId) {
-      return false
+      return false;
     }
     return true;
   }
